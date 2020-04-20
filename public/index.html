@@ -3,63 +3,195 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+    <title>GHWorkbook</title>
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/7.14.1/firebase-app.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/7.14.1/firebase-auth.js"></script>
-    <script defer src="/__/firebase/7.14.1/firebase-database.js"></script>
-    <script defer src="/__/firebase/7.14.1/firebase-messaging.js"></script>
-    <script defer src="/__/firebase/7.14.1/firebase-storage.js"></script>
-    <!-- initialize the SDK after all desired features are loaded -->
-    <script defer src="/__/firebase/init.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
+<!--    &lt;!&ndash; update the version number as needed &ndash;&gt;-->
+<!--    <script defer src="/__/firebase/7.14.1/firebase-app.js"></script>-->
+<!--    &lt;!&ndash; include only the Firebase features as you need &ndash;&gt;-->
+<!--    <script defer src="/__/firebase/7.14.1/firebase-auth.js"></script>-->
+<!--    <script defer src="/__/firebase/7.14.1/firebase-database.js"></script>-->
+<!--    <script defer src="/__/firebase/7.14.1/firebase-messaging.js"></script>-->
+<!--    <script defer src="/__/firebase/7.14.1/firebase-storage.js"></script>-->
+<!--    &lt;!&ndash; initialize the SDK after all desired features are loaded &ndash;&gt;-->
+<!--    <script defer src="/__/firebase/init.js"></script>-->
+
+    <style>
+      .q-template {
+        display: none;
+      }
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .item {
+
+      }
+      .ans {
+        font-weight: bold;
+        color: red;
+      }
+      .hide {
+        visibility: hidden;
+      }
+      .time {
+        width: 80px;
+      }
+      .order, .user-order {
+        width: 20px;
       }
     </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+      function init(){
+        fetch('./q.tsv')
+                .then(res => res.text())
+                .then(qText => {
+                  const qArr = getQ(qText);
+                  setView(qArr);
+                });
+      }
 
-        try {
-          let app = firebase.app();
-          let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
-          document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
+      function getQ(text, count = 5){
+        const rows = text.split('\n');
+        const qs = [];
+        for(let i=0; i<rows.length; i++){
+          const rowArr = rows[i].split('\t');
+          for(let j=1; j<rowArr.length; j++){
+            const q = {time:rowArr[0], content:rowArr[j], };
+            qs.push(q);
+          }
         }
-      });
+        const res = [];
+        const indexSet = {};
+        for(let i=0; i<count; i++){
+          const max = qs.length;
+          const index = Math.round(max * Math.random() -1);
+          if(indexSet[index] === undefined){
+            res.push(qs[index]);
+            indexSet[index] = true;
+          } else {
+            i--;
+          }
+        }
+        return res;
+      }
+      function setView(qArray){
+        const container = $('.q-container');
+        container.html('');
+
+        qArray = setOrder(qArray);
+
+        for(let i=0; i<qArray.length; i++){
+          const el = $('.q-template').clone();
+          el.removeClass("q-template");
+          el.find('input[type=checkbox]').removeClass('hide');
+
+          const data = qArray[i];
+          el.find('.time').text(data.time);
+          el.find('.order').text(data.order);
+          el.find('.content').text(data.content);
+          container.append(el);
+        }
+      }
+      function setOrder(qArray){
+        qArray.sort(function(a, b){return a.time - b.time});
+        for(let i=0; i<qArray.length; i++){
+          qArray[i].order = i+1;
+        }
+        qArray.sort(() => Math.random() - Math.random());
+        return qArray;
+      }
+
+      function check(){
+        const arr = getQRows();
+        let result = true;
+        for(let i=0; i<arr.length; i++){
+          const q = $(arr[i]);
+          if(q.find('.user-order').text() === ""){
+            alert("전부 체크 하세요.");
+            return;
+          }
+        }
+        for(let i=0; i<arr.length; i++){
+          const q = $(arr[i]);
+          if(q.find('.user-order').text() !== q.find('.order').text()){
+            result = false;
+            break;
+          }
+        }
+        if(result){
+          alert("정답");
+        } else {
+          alert("다음 기회에");
+        }
+        arr.find('.hide').removeClass('hide');
+      }
+      function setUserOrder(){
+        const arr = getQRows();
+        const checkCount = $('.q-container > .container .user-order-check:checked').length;
+        let userOrderCount = 0;
+        for(let i=0; i<arr.length; i++){
+          if($(arr[i]).find('.user-order').text() !== ""){
+            userOrderCount++;
+          }
+        }
+        if(checkCount > userOrderCount){
+          const targetArr = arr.find('input.user-order-check:checked');
+          for(let i=0; i<targetArr.length; i++){
+            const target = $(targetArr[i]).parent().parent().parent().find('.user-order');
+            if(target.text() === ""){
+              target.text(checkCount);
+              break;
+            }
+          }
+        } else {
+          let deleted = -1;
+          for(let i=0; i<arr.length; i++){
+            const row = $(arr[i]);
+            if(row.find('.user-order').text() !== "" && row.find('.user-order-check:checked').length === 0){
+              deleted = parseInt(row.find('.user-order').text());
+            }
+          }
+          for(let i=0; i<arr.length; i++){
+            const target = $(arr[i]).find('.user-order');
+            const targetText = target.text();
+            if(targetText !== ""){
+              const targetInt = parseInt(targetText);
+              if(targetInt > deleted){
+                target.text(targetInt-1)
+              } else if(targetInt === deleted){
+                target.text("");
+              }
+            }
+          }
+        }
+      }
+      function getQRows(){
+        return $('.q-container > .container');
+      }
     </script>
+  </head>
+  <body>
+    <div>
+      <h2>굿럭</h2>
+      <div class="q-container"></div>
+    </div>
+    <div>
+      <button onclick="init()">초기화</button>
+      <button onclick="check()">정답 확인</button>
+    </div>
+    <div class="q-template container">
+      <div class="item ans time hide"></div>
+      <div class="item ans order hide"></div>
+      <div class="item user-order"></div>
+      <div class="item check">
+        <label>
+          <input class="user-order-check hide" type="checkbox" onclick="setUserOrder()" />
+        </label>
+      </div>
+      <div class="item content"></div>
+    </div>
   </body>
 </html>
