@@ -7,16 +7,6 @@
 
     <script src="https://code.jquery.com/jquery-3.5.0.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
 
-<!--    &lt;!&ndash; update the version number as needed &ndash;&gt;-->
-<!--    <script defer src="/__/firebase/7.14.1/firebase-app.js"></script>-->
-<!--    &lt;!&ndash; include only the Firebase features as you need &ndash;&gt;-->
-<!--    <script defer src="/__/firebase/7.14.1/firebase-auth.js"></script>-->
-<!--    <script defer src="/__/firebase/7.14.1/firebase-database.js"></script>-->
-<!--    <script defer src="/__/firebase/7.14.1/firebase-messaging.js"></script>-->
-<!--    <script defer src="/__/firebase/7.14.1/firebase-storage.js"></script>-->
-<!--    &lt;!&ndash; initialize the SDK after all desired features are loaded &ndash;&gt;-->
-<!--    <script defer src="/__/firebase/init.js"></script>-->
-
     <style>
       .q-template {
         display: none;
@@ -36,7 +26,7 @@
         visibility: hidden;
       }
       .time {
-        width: 60px;
+        width: 100px;
       }
       .order, .user-order {
         width: 15px;
@@ -47,8 +37,9 @@
       $(document).ready(function(){
         init();
       });
-      function init(){
-        fetch('./q.tsv')
+      function init(bookName = $('input[name=bookType]:checked').val()){
+        const bookPath = "./";
+        fetch(bookPath + bookName)
                 .then(res => res.text())
                 .then(qText => {
                   const qArr = getQ(qText);
@@ -179,6 +170,20 @@
   <body>
     <div>
       <h2>굿럭</h2>
+      <div>
+        <div>시대 선택</div>
+        <div class="container">
+          <div class="item"><label for="type1">고대사</label>   <input id="type1" type="radio" name="bookType" value="고대사.tsv" checked /></div>
+          <div class="item">　　</div>
+          <div class="item"><label for="type2">남북국</label>   <input id="type2" type="radio" name="bookType" value="남북국.tsv" /></div>
+          <div class="item">　　</div>
+          <div class="item"><label for="type3">구한말</label>   <input id="type3" type="radio" name="bookType" value="구한말.tsv" /></div>
+          <div class="item">　　</div>
+          <div class="item"><label for="type4">일제강점기</label><input id="type4" type="radio" name="bookType" value="일제강점기.tsv" /></div>
+          <div class="item">　　</div>
+          <div class="item"><label for="type5">현대사</label>   <input id="type5" type="radio" name="bookType" value="현대사.tsv"/></div>
+        </div>
+      </div>
       <div class="q-container"></div>
     </div>
     <div>
