@@ -44,6 +44,9 @@
     </style>
 
     <script>
+      $(document).ready(function(){
+        init();
+      });
       function init(){
         fetch('./q.tsv')
                 .then(res => res.text())
