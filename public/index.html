@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>GHWorkbook</title>
 
-    <script src="https://code.jquery.com/jquery-3.5.0.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
-
     <style>
       .q-template {
         display: none;
@@ -34,10 +32,7 @@
     </style>
 
     <script>
-      $(document).ready(function(){
-        init();
-      });
-      function init(bookName = $('input[name=bookType]:checked').val()){
+      function init(bookName = document.querySelector('input[name=bookType]:checked').value){
         const bookPath = "./";
         fetch(bookPath + bookName)
                 .then(res => res.text())
@@ -72,21 +67,21 @@
         return res;
       }
       function setView(qArray){
-        const container = $('.q-container');
-        container.html('');
+        const container = document.querySelector('.q-container');
+        container.innerHTML = '';
 
         qArray = setOrder(qArray);
 
         for(let i=0; i<qArray.length; i++){
-          const el = $('.q-template').clone();
-          el.removeClass("q-template");
-          el.find('input[type=checkbox]').removeClass('hide');
+          const el = document.querySelector('.q-template').cloneNode(true);
+          el.classList.remove("q-template");
+          el.querySelector('input[type=checkbox]').classList.remove('hide');
 
           const data = qArray[i];
-          el.find('.time').text(data.time);
-          el.find('.order').text(data.order);
-          el.find('.content').text(data.content);
-          container.append(el);
+          el.querySelector('.time').innerText = data.time;
+          el.querySelector('.order').innerText = data.order;
+          el.querySelector('.content').innerText = data.content;
+          container.innerHTML = container.innerHTML + el.outerHTML;
         }
       }
       function setOrder(qArray){
@@ -102,15 +97,15 @@
         const arr = getQRows();
         let result = true;
         for(let i=0; i<arr.length; i++){
-          const q = $(arr[i]);
-          if(q.find('.user-order').text() === ""){
+          const q = arr[i];
+          if(q.querySelector('.user-order').innerText === ""){
             alert("전부 체크 하세요.");
             return;
           }
         }
         for(let i=0; i<arr.length; i++){
-          const q = $(arr[i]);
-          if(q.find('.user-order').text() !== q.find('.order').text()){
+          const q = arr[i];
+          if(q.querySelector('.user-order').innerText !== q.querySelector('.order').innerText){
             result = false;
             break;
           }
@@ -120,54 +115,62 @@
         } else {
           alert("다음 기회에");
         }
-        arr.find('.hide').removeClass('hide');
+        for(let i=0; i<arr.length; i++){
+          const row = arr[i].querySelectorAll('.hide');
+          for(let j=0; j < row.length; j++){
+            const col = row[j];
+            col.classList.remove('hide');
+          }
+        }
       }
       function setUserOrder(){
         const arr = getQRows();
-        const checkCount = $('.q-container > .container .user-order-check:checked').length;
+        const checkCount = document.querySelectorAll('.q-container > .container .user-order-check:checked').length;
         let userOrderCount = 0;
         for(let i=0; i<arr.length; i++){
-          if($(arr[i]).find('.user-order').text() !== ""){
+          if(arr[i].querySelector('.user-order').innerText !== ""){
             userOrderCount++;
           }
         }
         if(checkCount > userOrderCount){
-          const targetArr = arr.find('input.user-order-check:checked');
-          for(let i=0; i<targetArr.length; i++){
-            const target = $(targetArr[i]).parent().parent().parent().find('.user-order');
-            if(target.text() === ""){
-              target.text(checkCount);
-              break;
+          for(let i=0; i<arr.length; i++){
+            const targetArr = arr[i].querySelectorAll('input.user-order-check:checked');
+            if(targetArr.length > 0){
+              const target = targetArr[0].parentNode.parentNode.parentNode.querySelector('.user-order');
+              if(target.innerText === ""){
+                target.innerText = checkCount;
+                break;
+              }
             }
           }
         } else {
           let deleted = -1;
           for(let i=0; i<arr.length; i++){
-            const row = $(arr[i]);
-            if(row.find('.user-order').text() !== "" && row.find('.user-order-check:checked').length === 0){
-              deleted = parseInt(row.find('.user-order').text());
+            const row = arr[i];
+            if(row.querySelector('.user-order').innerText !== "" && row.querySelectorAll('.user-order-check:checked').length === 0){
+              deleted = parseInt(row.querySelector('.user-order').innerText);
             }
           }
           for(let i=0; i<arr.length; i++){
-            const target = $(arr[i]).find('.user-order');
-            const targetText = target.text();
+            const target = arr[i].querySelector('.user-order');
+            const targetText = target.innerText;
             if(targetText !== ""){
               const targetInt = parseInt(targetText);
               if(targetInt > deleted){
-                target.text(targetInt-1)
+                target.innerText = targetInt-1;
               } else if(targetInt === deleted){
-                target.text("");
+                target.innerText = "";
               }
             }
           }
         }
       }
       function getQRows(){
-        return $('.q-container > .container');
+        return document.querySelectorAll('.q-container > .container');
       }
     </script>
   </head>
-  <body>
+  <body onload="init();">
     <div>
       <h2>굿럭</h2>
       <div>
