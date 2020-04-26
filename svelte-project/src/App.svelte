@@ -1,17 +1,28 @@
 <script>
     import { onMount } from 'svelte';
-    onMount(async () => {
-        const res = await fetch(`https://jsonplaceholder.typicode.com/photos?_limit=20`);
-        photos = await res.json();
-    });
 
-    function init(bookName = $('input[name=bookType]:checked').val()){
+    let qData = [];
+    let hideAns = true;
+    let selectedBookPath = '고대사.tsv';
+    const bookType = [
+        {file:'고대사.tsv', title:'고대사'},
+        {file:'남북국.tsv', title:'남북국'},
+        {file:'구한말.tsv', title:'구한말'},
+        {file:'일제강점기.tsv', title:'일제강점기'},
+        {file:'현대사.tsv', title:'현대사'},
+    ]
+
+    onMount(async () => {
+        init();
+    });
+    function init(){
+        hideAns = true;
         const bookPath = "./";
-        fetch(bookPath + bookName)
+        fetch(bookPath + selectedBookPath)
                 .then(res => res.text())
                 .then(qText => {
                     const qArr = getQ(qText);
-                    setView(qArr);
+                    qData = setOrder(qArr);
                 });
     }
 
@@ -21,7 +32,7 @@
         for(let i=0; i<rows.length; i++){
             const rowArr = rows[i].split('\t');
             for(let j=1; j<rowArr.length; j++){
-                const q = {time:rowArr[0], content:rowArr[j], };
+                const q = {time:rowArr[0], order:'', user_order:'', user_check:false, content:rowArr[j]};
                 qs.push(q);
             }
         }
@@ -29,7 +40,7 @@
         const indexSet = {};
         for(let i=0; i<count; i++){
             const max = qs.length;
-            const index = Math.round(max * Math.random() -1);
+            const index = Math.round(max * Math.random() - 0.5);
             if(indexSet[index] === undefined){
                 res.push(qs[index]);
                 indexSet[index] = true;
@@ -40,21 +51,21 @@
         return res;
     }
     function setView(qArray){
-        const container = $('.q-container');
-        container.html('');
+        const container = document.querySelector('.q-container');
+        container.innerHTML = '';
 
         qArray = setOrder(qArray);
 
         for(let i=0; i<qArray.length; i++){
-            const el = $('.q-template').clone();
-            el.removeClass("q-template");
-            el.find('input[type=checkbox]').removeClass('hide');
+            const el = document.querySelector('.q-template').cloneNode(true);
+            el.classList.remove("q-template");
+            el.querySelector('input[type=checkbox]').classList.remove('hide');
 
             const data = qArray[i];
-            el.find('.time').text(data.time);
-            el.find('.order').text(data.order);
-            el.find('.content').text(data.content);
-            container.append(el);
+            el.querySelector('.time').innerText = data.time;
+            el.querySelector('.order').innerText = data.order;
+            el.querySelector('.content').innerText = data.content;
+            container.innerHTML = container.innerHTML + el.outerHTML;
         }
     }
     function setOrder(qArray){
@@ -70,15 +81,15 @@
         const arr = getQRows();
         let result = true;
         for(let i=0; i<arr.length; i++){
-            const q = $(arr[i]);
-            if(q.find('.user-order').text() === ""){
+            const q = arr[i];
+            if(q.querySelector('.user-order').innerText === ""){
                 alert("전부 체크 하세요.");
                 return;
             }
         }
         for(let i=0; i<arr.length; i++){
-            const q = $(arr[i]);
-            if(q.find('.user-order').text() !== q.find('.order').text()){
+            const q = arr[i];
+            if(q.querySelector('.user-order').innerText !== q.querySelector('.order').innerText){
                 result = false;
                 break;
             }
@@ -88,50 +99,52 @@
         } else {
             alert("다음 기회에");
         }
-        arr.find('.hide').removeClass('hide');
+        hideAns = false;
     }
     function setUserOrder(){
         const arr = getQRows();
-        const checkCount = $('.q-container > .container .user-order-check:checked').length;
+        const checkCount = document.querySelectorAll('.q-container > .container .user-order-check:checked').length;
         let userOrderCount = 0;
         for(let i=0; i<arr.length; i++){
-            if($(arr[i]).find('.user-order').text() !== ""){
+            if(arr[i].querySelector('.user-order').innerText !== ""){
                 userOrderCount++;
             }
         }
         if(checkCount > userOrderCount){
-            const targetArr = arr.find('input.user-order-check:checked');
-            for(let i=0; i<targetArr.length; i++){
-                const target = $(targetArr[i]).parent().parent().parent().find('.user-order');
-                if(target.text() === ""){
-                    target.text(checkCount);
-                    break;
+            for(let i=0; i<arr.length; i++){
+                const targetArr = arr[i].querySelectorAll('input.user-order-check:checked');
+                if(targetArr.length > 0){
+                    const target = targetArr[0].parentNode.parentNode.parentNode.querySelector('.user-order');
+                    if(target.innerText === ""){
+                        target.innerText = checkCount;
+                        break;
+                    }
                 }
             }
         } else {
             let deleted = -1;
             for(let i=0; i<arr.length; i++){
-                const row = $(arr[i]);
-                if(row.find('.user-order').text() !== "" && row.find('.user-order-check:checked').length === 0){
-                    deleted = parseInt(row.find('.user-order').text());
+                const row = arr[i];
+                if(row.querySelector('.user-order').innerText !== "" && row.querySelectorAll('.user-order-check:checked').length === 0){
+                    deleted = parseInt(row.querySelector('.user-order').innerText);
                 }
             }
             for(let i=0; i<arr.length; i++){
-                const target = $(arr[i]).find('.user-order');
-                const targetText = target.text();
+                const target = arr[i].querySelector('.user-order');
+                const targetText = target.innerText;
                 if(targetText !== ""){
                     const targetInt = parseInt(targetText);
                     if(targetInt > deleted){
-                        target.text(targetInt-1)
+                        target.innerText = targetInt-1;
                     } else if(targetInt === deleted){
-                        target.text("");
+                        target.innerText = "";
                     }
                 }
             }
         }
     }
     function getQRows(){
-        return $('.q-container > .container');
+        return document.querySelectorAll('.q-container > .container');
     }
 </script>
 
@@ -141,32 +154,58 @@
         <div>
             <div>시대 선택</div>
             <div class="container">
-                <div class="item"><label for="type1">고대사</label>   <input id="type1" type="radio" name="bookType" value="고대사.tsv" checked /></div>
-                <div class="item">　　</div>
-                <div class="item"><label for="type2">남북국</label>   <input id="type2" type="radio" name="bookType" value="남북국.tsv" /></div>
-                <div class="item">　　</div>
-                <div class="item"><label for="type3">구한말</label>   <input id="type3" type="radio" name="bookType" value="구한말.tsv" /></div>
-                <div class="item">　　</div>
-                <div class="item"><label for="type4">일제강점기</label><input id="type4" type="radio" name="bookType" value="일제강점기.tsv" /></div>
-                <div class="item">　　</div>
-                <div class="item"><label for="type5">현대사</label>   <input id="type5" type="radio" name="bookType" value="현대사.tsv"/></div>
+                {#each bookType as {title, file}, i}
+                    <div class="container item">　　</div>
+                    <div class="container item">
+                        <label for={'book_' + i}>{title}</label>
+                        <input id={'book_' + i} type="radio" name="bookType" value={file} bind:group={selectedBookPath} />
+                    </div>
+                {/each}
             </div>
         </div>
-        <div class="q-container"></div>
+        <div class="q-container">
+            {#each qData as {time, order, user_order, user_check, content}}
+                <div class="container">
+                    <div class="item ans time" class:hide={hideAns}>{time}</div>
+                    <div class="item ans order" class:hide={hideAns}>{order}</div>
+                    <div class="item user-order">{user_order}</div>
+                    <div class="item check">
+                        <label>
+                            <input class="user-order-check" type="checkbox" bind:checked={user_check} on:click={setUserOrder} />
+                        </label>
+                    </div>
+                    <div class="item content">{content}</div>
+                </div>
+            {/each}
+        </div>
     </div>
     <div>
-        <button onclick="init()">초기화</button>
-        <button onclick="check()">정답 확인</button>
-    </div>
-    <div class="q-template container">
-        <div class="item ans time hide"></div>
-        <div class="item ans order hide"></div>
-        <div class="item user-order"></div>
-        <div class="item check">
-            <label>
-                <input class="user-order-check hide" type="checkbox" onclick="setUserOrder()" />
-            </label>
-        </div>
-        <div class="item content"></div>
+        <button on:click={init}>초기화</button>
+        <button on:click={check}>정답 확인</button>
     </div>
 </div>
+<style>
+    .q-template {
+        display: none;
+    }
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .item {
+
+    }
+    .ans {
+        font-weight: bold;
+        color: red;
+    }
+    .hide {
+        visibility: hidden;
+    }
+    .time {
+        width: 100px;
+    }
+    .order, .user-order {
+        width: 15px;
+    }
+</style>
