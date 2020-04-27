@@ -5,13 +5,13 @@
 
     let qData = [];
     let hideAns = true;
-    let selectedBookPath = '고대사.tsv';
+    let selectedBookPath = '고대사';
     let bookType = [
-        {file:'고대사.tsv', title:'고대사'},
-        {file:'남북국.tsv', title:'남북국'},
-        {file:'구한말.tsv', title:'구한말'},
-        {file:'일제강점기.tsv', title:'일제강점기'},
-        {file:'현대사.tsv', title:'현대사'},
+        {file:'고대사', title:'고대사'},
+        {file:'남북국', title:'남북국'},
+        {file:'구한말', title:'구한말'},
+        {file:'일제강점기', title:'일제강점기'},
+        {file:'현대사', title:'현대사'},
     ]
 
     onMount(async () => {
@@ -19,20 +19,19 @@
     });
     function init(){
         hideAns = true;
-        const bookPath = "./";
+        const bookPath = "https://script.google.com/macros/s/AKfycbxTpVMCp260XF7osyNWJL8tm7iqA931GLluKEJadyu3NelC8EY/exec?sheetName=";
         fetch(bookPath + selectedBookPath)
-                .then(res => res.text())
-                .then(qText => {
-                    const qArr = getQ(qText);
+                .then(res => res.json())
+                .then(data => {
+                    const qArr = getQ(data.data);
                     qData = setOrder(qArr);
                 });
     }
 
-    function getQ(text, count = 5){
-        const rows = text.split('\n');
+    function getQ(qArr, count = 5){
         const qs = [];
-        for(let i=0; i<rows.length; i++){
-            const rowArr = rows[i].split('\t');
+        for(let i=0; i<qArr.length; i++){
+            const rowArr = qArr[i];
             for(let j=1; j<rowArr.length; j++){
                 const content = rowArr[j];
                 if(content === undefined || content === null || content.length === 0){
