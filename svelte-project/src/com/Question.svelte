@@ -14,11 +14,12 @@
             qData[index].user_check = true;
             qData[index].user_order = currentMaxOrder+1;
         } else {
+            const num = parseInt(qData[index].user_order);
             qData[index].user_check = false;
             qData[index].user_order = "";
-            for(let i=index; i<qData.length; i++){
+            for(let i=0; i<qData.length; i++){
                 const target = qData[i];
-                if(target.user_check){
+                if(target.user_check && parseInt(target.user_order) > num){
                     qData[i].user_order = parseInt(qData[i].user_order) - 1;
                 }
             }
