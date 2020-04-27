@@ -34,6 +34,10 @@
         for(let i=0; i<rows.length; i++){
             const rowArr = rows[i].split('\t');
             for(let j=1; j<rowArr.length; j++){
+                const content = rowArr[j];
+                if(content === undefined || content === null || content.length === 0){
+                    continue;
+                }
                 const q = {time:rowArr[0], order:'', user_order:'', user_check:false, content:rowArr[j]};
                 qs.push(q);
             }
