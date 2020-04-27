@@ -2,44 +2,24 @@
     export let qData;
     export let hideAns;
 
-    function setUserOrder(){
-        const arr = getQRows();
-        const checkCount = document.querySelectorAll('.q-container > .container .user-order-check:checked').length;
-        let userOrderCount = 0;
-        for(let i=0; i<arr.length; i++){
-            if(arr[i].querySelector('.user-order').innerText !== ""){
-                userOrderCount++;
+    function setUserOrder(index){
+        let currentMaxOrder = 0;
+        for(let i=0; i<qData.length; i++){
+            if(qData[i].user_check){
+                currentMaxOrder++;
             }
         }
-        if(checkCount > userOrderCount){
-            for(let i=0; i<arr.length; i++){
-                const targetArr = arr[i].querySelectorAll('input.user-order-check:checked');
-                if(targetArr.length > 0){
-                    const target = targetArr[0].parentNode.parentNode.parentNode.querySelector('.user-order');
-                    if(target.innerText === ""){
-                        target.innerText = checkCount;
-                        break;
-                    }
-                }
-            }
+        console.log(index, qData[index]);
+        if(!qData[index].user_check){
+            qData[index].user_check = true;
+            qData[index].user_order = currentMaxOrder+1;
         } else {
-            let deleted = -1;
-            for(let i=0; i<arr.length; i++){
-                const row = arr[i];
-                if(row.querySelector('.user-order').innerText !== "" && row.querySelectorAll('.user-order-check:checked').length === 0){
-                    deleted = parseInt(row.querySelector('.user-order').innerText);
-                }
-            }
-            for(let i=0; i<arr.length; i++){
-                const target = arr[i].querySelector('.user-order');
-                const targetText = target.innerText;
-                if(targetText !== ""){
-                    const targetInt = parseInt(targetText);
-                    if(targetInt > deleted){
-                        target.innerText = targetInt-1;
-                    } else if(targetInt === deleted){
-                        target.innerText = "";
-                    }
+            qData[index].user_check = false;
+            qData[index].user_order = "";
+            for(let i=index; i<qData.length; i++){
+                const target = qData[i];
+                if(target.user_check){
+                    qData[i].user_order = parseInt(qData[i].user_order) - 1;
                 }
             }
         }
@@ -51,14 +31,14 @@
 
 
 <div class="q-container">
-    {#each qData as {time, order, user_order, user_check, content} (time)}
+    {#each qData as {time, order, user_order, user_check, content}, i (time)}
         <div class="container">
             <div class="item ans time" class:hide={hideAns}>{time}</div>
             <div class="item ans order" class:hide={hideAns}>{order}</div>
             <div class="item user-order">{user_order}</div>
             <div class="item check">
                 <label>
-                    <input class="user-order-check" type="checkbox" bind:checked={user_check} on:click={setUserOrder} />
+                    <input class="user-order-check" type="checkbox" bind:checked={user_check} on:click={setUserOrder(i)} />
                 </label>
             </div>
             <div class="item content">{content}</div>

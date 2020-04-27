@@ -66,20 +66,15 @@
     }
 
     function check(){
-        const arr = getQRows();
         let result = true;
-        for(let i=0; i<arr.length; i++){
-            const q = arr[i];
-            if(q.querySelector('.user-order').innerText === ""){
+        for(let i=0; i<qData.length; i++){
+            const q = qData[i];
+            if(q.user_order === ""){
                 alert("전부 체크 하세요.");
                 return;
             }
-        }
-        for(let i=0; i<arr.length; i++){
-            const q = arr[i];
-            if(q.querySelector('.user-order').innerText !== q.querySelector('.order').innerText){
+            if(q.user_order !== q.order){
                 result = false;
-                break;
             }
         }
         if(result){
