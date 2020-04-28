@@ -33,22 +33,22 @@
 
 <div class="q-container">
     {#each qData as {time, order, user_order, user_check, content}, i (time)}
-        <div class="container">
-            <div class="item ans time" class:hide={hideAns}>{time}</div>
-            <div class="item ans order" class:hide={hideAns}>{order}</div>
-            <div class="item user-order">{user_order}</div>
-            <div class="item check">
+        <div class="b-container">
+            <div class="ans time" class:hide={hideAns}>{time}</div>
+            <div class="ans order" class:hide={hideAns}>{order}</div>
+            <div class="user-order">{user_order}</div>
+            <div class="check">
                 <label>
                     <input class="user-order-check" type="checkbox" bind:checked={user_check} on:click={setUserOrder(i)} />
                 </label>
             </div>
-            <div class="item content">{content}</div>
+            <div class="content">{content}</div>
         </div>
     {/each}
 </div>
 
 <style>
-    .container {
+    .b-container {
         display: flex;
         flex-wrap: wrap;
     }

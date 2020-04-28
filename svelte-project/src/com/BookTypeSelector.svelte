@@ -3,18 +3,18 @@
     export let selectedBook;
 </script>
 
-<div class="container">
-    {#each dataArr as {title, file}, i}
-        <div class="container item">
+<div class="b-container">
+    {#each dataArr as title, i}
+        <div class="b-container">
             <label for={'book_' + i}>{title}</label>
-            <input id={'book_' + i} type="radio" name="bookPath" value={file} bind:group={selectedBook} />
+            <input id={'book_' + i} type="radio" name="bookPath" value={title} bind:group={selectedBook} />
         </div>
-        <div class="container item">　　</div>
+        <div class="b-container">　　</div>
     {/each}
 </div>
 
 <style>
-    .container {
+    .b-container {
         display: flex;
         flex-wrap: wrap;
     }
