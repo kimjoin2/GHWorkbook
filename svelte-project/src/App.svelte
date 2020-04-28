@@ -109,7 +109,7 @@
         <Question bind:hideAns={hideAns} bind:qData={qData} />
     </div>
     <div>
-        <button class="btn btn-secondary" on:click={init}>
+        <button class="btn btn-secondary" on:click={init} disabled="{bookSelectorLoading || qDataLoading}">
             {#if bookSelectorLoading || qDataLoading}
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" ></span>
             {/if}
