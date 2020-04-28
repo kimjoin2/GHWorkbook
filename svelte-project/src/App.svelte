@@ -13,23 +13,29 @@
     let hideAns = true;
     let selectedBookPath = '고대사';
     let bookType = []
+    let bookSelectorLoading = false;
+    let qDataLoading = false;
 
     onMount(async () => {
         init();
     });
     function init(){
         hideAns = true;
+        bookSelectorLoading = true;
+        qDataLoading = true;
         const bookPath = "https://script.google.com/macros/s/AKfycbxTpVMCp260XF7osyNWJL8tm7iqA931GLluKEJadyu3NelC8EY/exec?";
         fetch(bookPath + "action=sheetName")
                 .then(res => res.json())
                 .then(data => {
                     bookType = data.data;
+                    bookSelectorLoading = false;
                 });
         fetch(bookPath + "sheetName=" + selectedBookPath + "&action=qData")
                 .then(res => res.json())
                 .then(data => {
                     const qArr = getQ(data.data);
                     qData = setOrder(qArr);
+                    qDataLoading = false;
                 });
     }
 
@@ -103,7 +109,12 @@
         <Question bind:hideAns={hideAns} bind:qData={qData} />
     </div>
     <div>
-        <button class="btn btn-secondary" on:click={init}>초기화</button>
+        <button class="btn btn-secondary" on:click={init}>
+            {#if bookSelectorLoading || qDataLoading}
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" ></span>
+            {/if}
+            초기화
+        </button>
         <button class="btn btn-primary" on:click={check}>정답 확인</button>
     </div>
 </div>
