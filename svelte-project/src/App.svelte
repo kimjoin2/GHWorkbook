@@ -7,6 +7,9 @@
 <script>
     import Router from 'svelte-spa-router';
     import routes from './routes';
+    import Header from './com/header/Header.svelte'
 </script>
 
+<Header />
+<br>
 <Router {routes} />

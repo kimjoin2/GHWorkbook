@@ -95,10 +95,12 @@
 
 <div>
     <div>
-        <h2>굿럭</h2>
+        <h2>시대 선택</h2>
         <div>
-            <div>시대 선택</div>
             <BookTypeSelector bind:dataArr={bookType} bind:selectedBook={selectedBookPath} />
+        </div>
+        <div>
+            먼저 발생한 사건 순으로 체크하시오
         </div>
         <Question bind:hideAns={hideAns} bind:qData={qData} />
     </div>
