@@ -14,9 +14,9 @@
             </div>
             <span>　</span>
             <div>{(i+1) + '. '}</div>
-            <span>　-　</span>
-            <div>{detail}</div>
             <span>　</span>
+            <div>{detail}</div>
+            <span>　-　</span>
             <div>{qClassification}</div>
             <span>　</span>
             {#if !hideAns && !correct}
