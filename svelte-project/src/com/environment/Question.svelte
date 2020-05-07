@@ -4,33 +4,33 @@
 
 </script>
 
-<div class="q-container">
+<div class="container1">
     {#each qData as {classification, detail, qClassification, correct}, i (detail)}
-        <div class="b-container">
-            <div class="check">
-                <label>
-                    <input name="ans" value={!correct} type="radio" />
-                </label>
+        <label class="row" for={'q_ans_'+i}>
+            <div class="col-2" style="display: flex">
+                <div class="row no-padding">
+                    <div class="col-1">
+                        <input id={'q_ans_'+i} name="ans" value={!correct} type="radio" />
+                    </div>
+                    <div class="col no-padding">
+                        <label>&nbsp;{(i+1) + '.'}</label>
+                    </div>
+                </div>
             </div>
-            <span>　</span>
-            <div>{(i+1) + '. '}</div>
-            <span>　</span>
-            <div>{detail}</div>
-            <span>　-　</span>
-            <div>{qClassification}</div>
-            <span>　</span>
-            {#if !hideAns && !correct}
-                <div class="ans">{classification}</div>
-            {/if}
-        </div>
+            <div class="col-7">{detail}</div>
+            <div class="col-3">
+                <div>
+                    {qClassification}
+                </div>
+                {#if !hideAns && !correct}
+                    <div class="ans">{classification}</div>
+                {/if}
+            </div>
+        </label>
     {/each}
 </div>
 
 <style>
-    .b-container {
-        display: flex;
-        flex-wrap: wrap;
-    }
     .ans {
         color: red;
         font-weight: bold;

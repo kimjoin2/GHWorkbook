@@ -72,14 +72,12 @@
             <EnvQTypeSelector bind:dataArr={qType} bind:selectedEnv={selectedQType} />
         </div>
         <div>
-            틀린 것을 고르시오
+            <span style="color: red; font-weight: bold;">틀린</span><span>&nbsp;것을 고르시오</span>
         </div>
         <Question bind:hideAns={hideAns} bind:qData={qData} bind:qClass={qClassification} bind:duplication={duplication} />
     </div>
     <div>
-        <button class="btn btn-secondary">
-            초기화
-        </button>
+        <button class="btn btn-secondary">초기화</button>
         <button class="btn btn-primary">정답 확인</button>
     </div>
 </div>

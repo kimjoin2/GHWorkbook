@@ -27,6 +27,7 @@ a:visited {
 
 label {
 	display: block;
+	padding: 0;
 }
 
 input, button, select, textarea {
@@ -63,4 +64,8 @@ button:not(:disabled):active {
 
 button:focus {
 	border-color: #666;
+}
+
+.no-padding {
+	padding: 0 !important;
 }
