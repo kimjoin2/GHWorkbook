@@ -9,7 +9,6 @@
                 currentMaxOrder++;
             }
         }
-        console.log(index, qData[index]);
         if(!qData[index].user_check){
             qData[index].user_check = true;
             qData[index].user_order = currentMaxOrder+1;
