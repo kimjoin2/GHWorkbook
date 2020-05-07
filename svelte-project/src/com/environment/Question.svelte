@@ -7,7 +7,7 @@
 <div class="container1">
     {#each qData as {classification, detail, qClassification, correct}, i (detail)}
         <label class="row" for={'q_ans_'+i}>
-            <div class="col-2" style="display: flex">
+            <div class="col-2 selector" style="display: flex">
                 <div class="row no-padding">
                     <div class="col-1">
                         <input id={'q_ans_'+i} name="ans" value={!correct} type="radio" />
@@ -17,8 +17,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-7">{detail}</div>
-            <div class="col-3">
+            <div class="col">{detail}</div>
+            <div class="col">
                 <div>
                     {qClassification}
                 </div>
@@ -34,5 +34,8 @@
     .ans {
         color: red;
         font-weight: bold;
+    }
+    .selector {
+        max-width: 60px !important;
     }
 </style>
