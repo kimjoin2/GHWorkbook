@@ -25,9 +25,6 @@
             }
         }
     }
-    function getQRows(){
-        return document.querySelectorAll('.q-container > .container');
-    }
 </script>
 
 
@@ -42,7 +39,9 @@
                     <input class="user-order-check" type="checkbox" bind:checked={user_check} on:click={setUserOrder(i)} />
                 </label>
             </div>
-            <div class="content">{content}</div>
+            <div class="">
+                <div class="col">{content}</div>
+            </div>
         </div>
     {/each}
 </div>
