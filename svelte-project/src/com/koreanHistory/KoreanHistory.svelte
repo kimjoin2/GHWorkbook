@@ -111,7 +111,7 @@
             {/if}
             초기화
         </button>
-        <button class="btn btn-primary" on:click={check}>정답 확인</button>
+        <button class="btn btn-primary" on:click={check} disabled={!hideAns}>정답 확인</button>
     </div>
 </div>
 

@@ -3,34 +3,81 @@
     import EnvQTypeSelector from './EnvQTypeSelector.svelte';
     import Question from './Question.svelte';
 
-    let hideAns = false;
-    let duplication = false;
-    let qType = [{title:'토양/지하수처리방법 분류(In or ex)'}, {title:'토양/지하수 처리방법'}, {title:'소음'}];
-    let selectedQType = '토양/지하수 처리방법';
+    let hideAns = true;
+    let duplication = true;
+    let qType = [];
+    let selectedQType = '';
     let qData = [];
-    qData = [
-        {classification: '토양증기추출법(SVE)', detail: '불포화대수층 위에 추출정 설치, 진공흡입하여 휘발성, 준휘발성 오염물질 제거'},
-        {classification: '공기분사법(에어스파징)', detail: '오염된 지하수 정화 위해 포화대 내에 공기 강제 주입, 지하수를 폭기시켜 VOC를 휘발, 제거'},
-        {classification: '바이오스파징', detail: '지하수면 아래의 포화대로 공기 주입 공급, 휘발성 유기물질을 불포화토양층으로 이동, 분해'},
-        {classification: '바이오벤팅', detail: '오염토양에 인위적으로 산소 공급, 미생물을 통한 생분해'},
-    ];
     let qClassification = [];
-    qClassification = [
-        '토양증기추출법(SVE)',
-        '공기분사법(에어스파징)',
-        '바이오스파징',
-        '바이오벤팅',
-        '수직차단벽',
-        '식물정화법',
-    ];
+    let selectedResult;
+    let selectorLoading = false;
+    let qDataLoading = false;
+
+    $: loadingFlag = selectorLoading || qDataLoading;
+    $: showAns = !hideAns;
+
+    function checkRequest(){
+        if(selectedResult){
+            // 정답
+            document.getElementById('rightModalButton').click();
+        } else {
+            // 오답
+            document.getElementById('wrongModalButton').click();
+        }
+        hideAns = false;
+    }
 
     onMount(async () => {
-        console.log('start');
-        init();
+        initStart();
     });
-    function init(){
-        qData = processQData();
-        console.log(qData);
+    function initStart() {
+        hideAns = true;
+        selectorLoading = true;
+        qDataLoading = true;
+        if(qType.length === 0){
+            const url = 'https://script.google.com/macros/s/AKfycbxJGF5r6cWjQsBzqKbRY3J0Ljo8MAORv9V5aZVMhDuMtWHVC0Y/exec?action=';
+            fetch(url + 'sheetName')
+                    .then(res => res.json())
+                    .then(data => {
+                        const title = [];
+                        for (let i = 0; i < data.data.length; i++) {
+                            title.push({title: data.data[i]});
+                        }
+                        qType = title;
+                        qInit(title[0].title);
+                        selectorLoading = false;
+                    });
+        } else {
+            selectorLoading = false;
+            qInit();
+        }
+    }
+    function qInit(defaultSheetName) {
+        const url = 'https://script.google.com/macros/s/AKfycbxJGF5r6cWjQsBzqKbRY3J0Ljo8MAORv9V5aZVMhDuMtWHVC0Y/exec?action=';
+        if(selectedQType === ''){
+            selectedQType = defaultSheetName;
+        }
+        fetch(url+'qData&sheetName='+selectedQType)
+                .then(res => res.json())
+                .then(data => {
+                    setQDataAndQClassification(data.data);
+                    qData = processQData();
+                    qDataLoading = false;
+                });
+    }
+    function setQDataAndQClassification(data){
+        const qArr = [];
+        const classSet = new Set();
+        for(let i=0; i<data.length; i++){
+            const row = data[i];
+            const classification = row[0];
+            const detail = row[1];
+            qArr.push({classification: classification, detail: detail});
+            classSet.add(classification);
+        }
+        qArr.sort(() => Math.random() - Math.random());
+        qData = qArr.slice(0,4);
+        qClassification = Array.from(classSet);
     }
     function processQData(){
         const index = Math.round(qData.length * Math.random() - 0.5);
@@ -74,10 +121,57 @@
         <div>
             <span style="color: red; font-weight: bold;">틀린</span><span>&nbsp;것을 고르시오</span>
         </div>
-        <Question bind:hideAns={hideAns} bind:qData={qData} bind:qClass={qClassification} bind:duplication={duplication} />
+        <Question bind:selectedResult={selectedResult} bind:hideAns={hideAns} bind:qData={qData} bind:qClass={qClassification} bind:duplication={duplication} />
     </div>
     <div>
-        <button class="btn btn-secondary">초기화</button>
-        <button class="btn btn-primary">정답 확인</button>
+        <button class="btn btn-secondary" on:click={initStart} disabled={loadingFlag}>
+            {#if loadingFlag}
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" ></span>
+            {/if}
+            초기화
+        </button>
+        <button class="btn btn-primary" on:click={checkRequest} disabled={showAns}>정답 확인</button>
+    </div>
+</div>
+
+<div style="display: none">
+    <button id="wrongModalButton" type="button" class="btn btn-primary" style="display: block;" data-toggle="modal" data-target="#wrongModalButtonModal">show</button>
+    <button id="rightModalButton" type="button" class="btn btn-primary" style="display: block;" data-toggle="modal" data-target="#rightModalButtonModal">show</button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="wrongModalButtonModal" tabindex="-1" role="dialog" aria-labelledby="wrongModalButtonModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="wrongModalButtonModalLabel">정답과 다릅니다.</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                천천히 생각해 보세요.
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="rightModalButtonModal" tabindex="-1" role="dialog" aria-labelledby="rightModalButtonModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rightModalButtonModalLabel">정답!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                정답정답!
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
     </div>
 </div>
